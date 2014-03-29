@@ -2,9 +2,9 @@ require "formula"
 
 class Phlawd < Formula
 
-  homepage "https://github.com/chinchliff/phlawd/releases/tag/3.4a"
-  url "https://github.com/chinchliff/phlawd/releases/download/3.4a/phlawd_3.4a_source.tar.gz"
-  sha1 "342cf5441e23e27984bf9e294c710b4a438d9fef"
+  homepage "https://github.com/chinchliff/phlawd/"
+  url "https://github.com/chinchliff/phlawd/releases/download/3.4a/phlawd_3.4a_src_with_sqlitewrapped_1.3.1.tar.gz"
+  sha1 "116158ee33b6c33e83a585b26481c5497c7b4ac7"
 
   fails_with :clang do
     build 503
@@ -15,8 +15,7 @@ class Phlawd < Formula
   end
 
   fails_with :llvm do
-    build 0
-    cause "Does not properly build with llvm."
+    cause "The llvm compiler is not supported."
   end
 
   # correct the makefile to look for dependencies where brew installs them
@@ -25,11 +24,16 @@ class Phlawd < Formula
   depends_on "mafft"
   depends_on "muscle"
   depends_on "quicktree"
-  depends_on "sqlitewrapped"
+  depends_on "sqlite"
 
   def install
-    system "make", "-f", "Makefile.MAC"
-    system "mv", "PHLAWD", "#{prefix}/"
+
+    # compile sqlitewrapped: a dependency included here since it uncommon and unmaintained
+    system "make", "-C", "sqlitewrapped-1.3.1"
+
+    # compile phlawd
+    system "make", "-C", "src", "-f", "Makefile.MAC"
+    system "mv", "src/PHLAWD", "#{prefix}/"
     install_target="/usr/local/bin/phlawd"
     if File.file?(install_target)
       system "mv", install_target, install_target + "_previous"
@@ -38,22 +42,23 @@ class Phlawd < Formula
   end
 
   test do
+    # currently developing tests, they will be included in next release
     system "PHLAWD"
   end
 end
 
 __END__
-diff --git a/Makefile.MAC b/Makefile.MAC
+diff --git a/src/Makefile.MAC b/src/Makefile.MAC
 index a48def0..4b683dd 100644
---- a/Makefile.MAC
-+++ b/Makefile.MAC
+--- a/src/Makefile.MAC
++++ b/src/Makefile.MAC
 @@ -91,8 +91,7 @@ all: PHLAWD
  # Tool invocations
  PHLAWD: $(OBJS) $(USER_OBJS)
  	@echo 'Building target: $@'
 -#	$(CC) $(CFLAGS) -L../deps/mac -L/usr/local/lib -L/usr/lib -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
 -	$(CC) $(CFLAGS) -L../deps/mac -L/usr/local/lib -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
-+	$(CC) $(CFLAGS) -L/usr/local/lib -I/usr/local/include -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
++	$(CC) $(CFLAGS) -L/usr/local/lib -I/usr/local/include -L../sqlitewrapped-1.3.1 -I../sqlitewrapped-1.3.1 -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
  	@echo 'Finished building target: $@'
  	@echo ' '
  
