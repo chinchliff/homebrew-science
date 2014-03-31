@@ -29,21 +29,17 @@ class Phlawd < Formula
   def install
 
     # compile sqlitewrapped: a dependency included here since it uncommon and unmaintained
-    system "make", "-C", "sqlitewrapped-1.3.1"
+    system *%w[make -C sqlitewrapped-1.3.1]
 
     # compile phlawd
-    system "make", "-C", "src", "-f", "Makefile.MAC"
-    system "mv", "src/PHLAWD", "#{prefix}/"
-    install_target="/usr/local/bin/phlawd"
-    if File.file?(install_target)
-      system "mv", install_target, install_target + "_previous"
-    end
-    system "ln", "-s", "#{prefix}/PHLAWD", install_target
+    system *%w[make -C src -f Makefile.MAC]
+    prefix.install "src/PHLAWD"
+    bin.install_symlink "../PHLAWD"
   end
 
   test do
     # currently developing tests, they will be included in next release
-    system "PHLAWD"
+    system "#{bin}/PHLAWD"
   end
 end
 
@@ -58,7 +54,7 @@ index a48def0..4b683dd 100644
  	@echo 'Building target: $@'
 -#	$(CC) $(CFLAGS) -L../deps/mac -L/usr/local/lib -L/usr/lib -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
 -	$(CC) $(CFLAGS) -L../deps/mac -L/usr/local/lib -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
-+	$(CC) $(CFLAGS) -L/usr/local/lib -I/usr/local/include -L../sqlitewrapped-1.3.1 -I../sqlitewrapped-1.3.1 -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
++	$(CC) $(CFLAGS) -L$HOMEBREW_PREFIX/lib -I$HOMEBREW_PREFIX/include -L../sqlitewrapped-1.3.1 -I../sqlitewrapped-1.3.1 -o "PHLAWD" $(OBJS) $(USER_OBJS) $(LIBS)
  	@echo 'Finished building target: $@'
  	@echo ' '
  
