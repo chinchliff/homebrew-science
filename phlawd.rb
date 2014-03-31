@@ -2,7 +2,7 @@ require "formula"
 
 class Phlawd < Formula
 
-  homepage "https://github.com/chinchliff/phlawd/"
+  homepage "http://www.phlawd.net/"
   url "https://github.com/chinchliff/phlawd/releases/download/3.4a/phlawd_3.4a_src_with_sqlitewrapped_1.3.1.tar.gz"
   sha1 "116158ee33b6c33e83a585b26481c5497c7b4ac7"
 
@@ -31,7 +31,7 @@ class Phlawd < Formula
     # compile sqlitewrapped: a dependency included here since it uncommon and unmaintained
     system *%w[make -C sqlitewrapped-1.3.1]
 
-    # compile phlawd
+    # compile and install phlawd
     system *%w[make -C src -f Makefile.MAC]
     prefix.install "src/PHLAWD"
     bin.install_symlink "../PHLAWD"
