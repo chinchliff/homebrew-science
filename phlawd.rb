@@ -3,7 +3,11 @@ require "formula"
 class Phlawd < Formula
 
   homepage "http://www.phlawd.net/"
+  
+  # the most up to date version of phlawd is the chinchliff fork, which contains a variety of bug fixes and new features.
+  # this fork and the (original) blackrim fork will eventually be merged.
   url "https://github.com/chinchliff/phlawd/releases/download/3.4a/phlawd_3.4a_src_with_sqlitewrapped_1.3.1.tar.gz"
+  head "https://github.com/chinchliff/phlawd.git"
   sha1 "116158ee33b6c33e83a585b26481c5497c7b4ac7"
 
   fails_with :clang do
